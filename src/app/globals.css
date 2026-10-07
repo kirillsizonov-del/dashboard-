@@ -1,0 +1,603 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+
+  /* Поверхности в тон фона quadcode.ai: нейтральный графит #08080B → #121317 */
+  --bg: #08080b;
+  --panel: rgba(22, 23, 28, 0.82);
+  --tile: #1a1b20;
+  --tile-hi: #23242b;
+  --line: rgba(255, 255, 255, 0.08);
+  --line-2: rgba(255, 255, 255, 0.16);
+
+  /* Текст */
+  --ink: #ffffff;
+  --ink-2: #d2d3df;
+  --muted: #9a9cb3;
+
+  /* Фирменный акцент: градиент гайдбука #FF9569 → #DD344D, сплошной как CTA на quadcode.ai */
+  --accent: #ff7a59;
+  --accent-2: #dd344d;
+  --accent-soft: #ffc2ad;
+  --accent-ink: #1a0b0b; /* текст поверх акцентной заливки */
+  --grad: linear-gradient(90deg, #ff9569 0%, #dd344d 100%);
+  --grad-diag: linear-gradient(135deg, #ff9569 0%, #dd344d 100%);
+  /* Концы градиента отдельно: для кольца таймера и SVG */
+  --grad-a: #ff9569;
+  --grad-b: #dd344d;
+  --accent-hover: #ff9569;
+  /* Акцент тройкой RGB для теней и свечений: rgb(var(--glow) / 0.5) */
+  --glow: 241 128 36;
+  /* Поля выбора и выпадающие меню */
+  --field: #18191e;
+  --menu: #15161a;
+  --prompt-bg: linear-gradient(160deg, #1a1b20 0%, #141519 100%);
+
+  /* Каналы. Порядок и оттенки проверены на различимость, не менять по одному */
+  --c-x: #e7e9f2;
+  --c-threads: #c98500;
+  --c-discord: #7a85f0;
+  --c-reddit: #ff5c2b;
+  --c-none: #747b89;
+
+  /* Тепловая карта: один оттенок, от тусклого к яркому */
+  --h0: #1a1b20;
+  --h1: #5a2328;
+  --h2: #a8393f;
+  --h3: #ff7a59;
+  --h4: #ffc2ad;
+
+  /* Состояния */
+  --good: #22c55e;
+  --warn: #fab219;
+  --serious: #f97066;
+  --crit: #f85a6a;
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-em: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Ночная тема: темнее и с более тёплым акцентом */
+:root[data-theme="night"] {
+  --bg: #050507;
+  --panel: rgba(16, 17, 21, 0.86);
+  --tile: #15161a;
+  --tile-hi: #1d1e23;
+  --line: rgba(255, 149, 105, 0.12);
+  --line-2: rgba(255, 149, 105, 0.26);
+
+  --ink: #f6f2f0;
+  --ink-2: #ddd6d6;
+  --muted: #9d97a6;
+
+  --accent: #f18024;
+  --accent-2: #dd344d;
+  --accent-soft: #ffc79a;
+  --accent-ink: #140a04;
+  --accent-hover: #ff9569;
+  --grad: linear-gradient(90deg, #ff9569 0%, #f18024 45%, #dd344d 100%);
+  --grad-diag: linear-gradient(135deg, #ff9569 0%, #f18024 45%, #dd344d 100%);
+  --grad-a: #ff9569;
+  --grad-b: #dd344d;
+  --glow: 241 128 36;
+  --field: #141519;
+  --menu: #0f1013;
+  --prompt-bg: linear-gradient(160deg, #15161a 0%, #0f1013 100%);
+
+  --h0: #15161a;
+  --h1: #5a2328;
+  --h2: #a8393f;
+  --h3: #f18024;
+  --h4: #ffc79a;
+
+  --good: #3ddc97;
+  --warn: #ffc23d;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-panel: var(--panel);
+  --color-tile: var(--tile);
+  --color-tile-hi: var(--tile-hi);
+  --color-line: var(--line);
+  --color-line-2: var(--line-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-hover: var(--accent-hover);
+  --color-field: var(--field);
+  --color-menu: var(--menu);
+  --color-good: var(--good);
+  --color-warn: var(--warn);
+  --color-serious: var(--serious);
+  --color-crit: var(--crit);
+  /* Гайдбук: League Spartan — единственная гарнитура бренда (заголовки 700, текст 400–500) */
+  --font-sans: var(--font-spartan), var(--font-jost), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-spartan), var(--font-jost), system-ui, sans-serif;
+  --font-serif: var(--font-cormorant), Georgia, serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, Menlo, monospace;
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html {
+  background: var(--bg);
+  /* Как на quadcode.ai: якоря и «наверх» едут плавно, шапка не перекрывает цель */
+  scroll-behavior: smooth;
+  scroll-padding-top: 88px;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Смена темы: цвета перетекают за 200 мс, а не прыгают */
+html.theme-fade,
+html.theme-fade * {
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    fill 0.2s ease,
+    stroke 0.2s ease !important;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Фон 1:1 с .qc-canvas на quadcode.ai: три мягких белых пятна поверх вертикального градиента #08080B → #121317 → #08080B */
+.ambient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(1200px 900px at 16% 20%, rgba(255, 255, 255, 0.043), transparent 68%),
+    radial-gradient(1400px 1000px at 84% 46%, rgba(255, 255, 255, 0.04), transparent 70%),
+    radial-gradient(1300px 1000px at 22% 84%, rgba(255, 255, 255, 0.04), transparent 70%),
+    linear-gradient(#08080b 0%, #0b0b0f 10%, #101115 15%, #121317 25%, #121317 75%, #101115 85%, #0b0b0f 90%, #08080b 100%);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+/* В слое base, чтобы классы вроде outline-none могли его отключать */
+@layer base {
+  :focus-visible {
+    outline: 2px solid rgb(var(--glow) / 0.9);
+    outline-offset: 2px;
+  }
+}
+
+button,
+[role="button"],
+select,
+summary,
+a {
+  cursor: pointer;
+}
+
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.7);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--tile-hi) transparent;
+}
+
+@layer components {
+/* ───────────── Типографика ───────────── */
+
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+/* Курсивный акцент в заголовках */
+.accent-serif {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 300;
+  letter-spacing: -0.01em;
+  font-size: 1.22em;
+  line-height: 0.9;
+}
+
+.grad-text {
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Моно-подпись капсом над блоками */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ───────────── Движение ───────────── */
+
+.press {
+  transition:
+    transform 0.12s var(--ease),
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    opacity 0.18s ease,
+    box-shadow 0.25s ease;
+}
+.press:active {
+  transform: scale(0.97);
+}
+
+/* Появление блоков по очереди: дочерние элементы .stagger всплывают друг за другом */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+.rise,
+.stagger > * {
+  animation: rise 0.75s var(--ease) backwards;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+.stagger > *:nth-child(1) { --i: 0; }
+.stagger > *:nth-child(2) { --i: 1; }
+.stagger > *:nth-child(3) { --i: 2; }
+.stagger > *:nth-child(4) { --i: 3; }
+.stagger > *:nth-child(5) { --i: 4; }
+.stagger > *:nth-child(6) { --i: 5; }
+.stagger > *:nth-child(7) { --i: 6; }
+.stagger > *:nth-child(n + 8) { --i: 7; }
+
+/* Заголовок выезжает по словам */
+@keyframes word-up {
+  from {
+    opacity: 0;
+    transform: translateY(0.55em);
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+.word {
+  display: inline-block;
+  animation: word-up 0.9s var(--ease) backwards;
+  animation-delay: calc(var(--i, 0) * 75ms + 60ms);
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.pop-in {
+  animation: pop-in 0.28s var(--ease) backwards;
+}
+.fade-in {
+  animation: fade-in 0.22s var(--ease) backwards;
+}
+
+/* Полосы и столбики вырастают из нуля. Через clip-path: без отдельного слоя на каждую полосу */
+@keyframes grow-x {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes grow-y {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+.grow-x {
+  animation: grow-x 1s var(--ease) backwards;
+  animation-delay: calc(var(--i, 0) * 60ms + 150ms);
+}
+.grow-y {
+  animation: grow-y 0.9s var(--ease) backwards;
+  animation-delay: 150ms;
+}
+
+/* Тепловая карта проявляется одной шторкой слева направо */
+@keyframes wipe-in {
+  from {
+    clip-path: inset(0 100% 0 0);
+    opacity: 0.3;
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+}
+.wipe-in {
+  animation: wipe-in 1.1s var(--ease) backwards;
+  animation-delay: 200ms;
+}
+
+@keyframes check-pop {
+  0% {
+    transform: scale(0.6);
+  }
+  60% {
+    transform: scale(1.18);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.check-pop {
+  animation: check-pop 0.35s var(--ease);
+}
+
+@keyframes ping-soft {
+  0% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(2.6);
+  }
+}
+.ping-soft {
+  animation: ping-soft 1.8s var(--ease) infinite;
+}
+
+/* Таймер круга: мягкое дыхание раз в 2 секунды, когда до сброса меньше 15 минут */
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+.pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+/* Кольцо таймера: убывает по секундам, в новый круг заполняется обратно за 600 мс */
+.cycle-ring {
+  transition:
+    stroke-dashoffset 0.6s var(--ease),
+    stroke 0.3s ease;
+}
+
+/* ───── Механики quadcode.ai ───── */
+
+/* Появление при скролле (.sr на сайте): элемент ниже экрана ждёт, Reveal в AppShell ставит .is-in */
+.sr {
+  opacity: 0;
+  transform: translateY(28px);
+  filter: blur(6px);
+  transition:
+    opacity 0.9s var(--ease),
+    transform 0.9s var(--ease),
+    filter 0.9s var(--ease);
+  transition-delay: calc(var(--sr-i, 0) * 60ms);
+}
+.sr.is-in {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+/* Тонкая градиентная линия сверху секции, прорисовывается слева направо (qc-rule-top) */
+.qc-rule {
+  position: relative;
+}
+.qc-rule::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(var(--glow) / 0.7), transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 1.2s var(--ease);
+  pointer-events: none;
+}
+.qc-rule.is-in::after,
+.qc-rule:not(.sr)::after {
+  transform: scaleX(1);
+}
+
+/* Бегущий блик по градиентному тексту (trydock-sheen на сайте) */
+.grad-flow {
+  background: linear-gradient(90deg, var(--grad-a), var(--grad-b), var(--grad-a));
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: grad-flow 6s linear infinite;
+}
+@keyframes grad-flow {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* Пульсирующая «живая» точка: бейджи статуса на сайте */
+.live-dot {
+  position: relative;
+  display: inline-flex;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--accent);
+}
+.live-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: inherit;
+  animation: ping-soft 1.8s var(--ease) infinite;
+}
+
+/* Таймлайн контент-плана: линия-«луч», бегущий пунктиром (beam-flow) */
+.beam {
+  background-image: linear-gradient(to bottom, rgb(var(--glow) / 0.65) 50%, transparent 50%);
+  background-size: 1px 12px;
+  animation: beam-flow 1.4s linear infinite;
+}
+@keyframes beam-flow {
+  to {
+    background-position: 0 24px;
+  }
+}
+
+/* Блик на главной кнопке */
+.sheen {
+  position: relative;
+  overflow: hidden;
+}
+.sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 45%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transform: translateX(-130%) skewX(-18deg);
+  pointer-events: none;
+}
+.sheen:hover::after {
+  animation: sheen 0.9s var(--ease);
+}
+@keyframes sheen {
+  to {
+    transform: translateX(240%) skewX(-18deg);
+  }
+}
+
+/* Карточка: на ховере только светлеет рамка, без подсветки за курсором */
+.card {
+  position: relative;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  transition:
+    border-color 0.3s ease,
+    transform 0.45s var(--ease),
+    box-shadow 0.45s var(--ease);
+}
+.card:hover {
+  border-color: var(--line-2);
+}
+.card > * {
+  position: relative;
+}
+.card-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 40px -24px rgba(0, 0, 0, 0.8);
+}
+
+/* Поле ввода с фирменной полоской слева */
+.prompt {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--prompt-bg);
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.35s var(--ease);
+}
+.prompt::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 2px;
+  background: linear-gradient(var(--grad-a), color-mix(in srgb, var(--grad-b) 25%, transparent));
+}
+.prompt:focus-within {
+  border-color: rgb(var(--glow) / 0.55);
+  box-shadow:
+    0 0 0 4px rgb(var(--glow) / 0.1),
+    0 20px 50px -30px rgb(var(--glow) / 0.5);
+}
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise,
+  .stagger > *,
+  .word,
+  .pop-in,
+  .fade-in,
+  .grow-x,
+  .grow-y,
+  .wipe-in,
+  .check-pop,
+  .ping-soft,
+  .pulse-soft,
+  .sheen:hover::after,
+  .grad-flow,
+  .live-dot::after,
+  .beam {
+    animation: none;
+  }
+  .sr {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
